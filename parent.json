@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the web app"
+            }
+        },
+        "appServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the app service plan"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "runtimeStack": {
+            "type": "string",
+            "defaultValue": "DOTNETCORE|6.0",
+            "metadata": {
+                "description": "The runtime stack for the web app."
+            }
+        },
+        "instanceCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "The number of instances to allocate for the app service plan."
+            }
+        }
+    },
+
+    "resources": [
+    {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2021-01-01",
+        "name": "ChildTemplate1",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[concat('file://app-service-plan.json')]"
+            },
+            "parameters": {
+                "appServicePlanName": { "value": "[parameters('appServicePlanName')]" },
+                "location": { "value": "[parameters('location')]" },
+                "runtimeStack": { "value": "[parameters('runtimeStack')]" },
+                "instanceCount": { "value": "[parameters('instanceCount')]" },
+                "webAppName": { "value": "[parameters('webAppName')]" }
+            }
+        }
+    },
+    {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2021-01-01",
+        "name": "ChildTemplate2",
+        "dependsOn": [
+            "ChildTemplate1"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[concat('file://web-app.json')]"
+            },
+            "parameters": {
+                "webAppName": { "value": "[parameters('webAppName')]" },
+                "location": { "value": "[parameters('location')]" },
+                "runtimeStack": { "value": "[parameters('runtimeStack')]" },
+                "appServicePlanName": { "value": "[parameters('appServicePlanName')]" }
+            }
+        }
+    }
+]
+}

@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+
+    "parameters": {
+        "appServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the app service plan"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "instanceCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "The number of instances to allocate for the app service plan."
+            }
+        }
+    },
+
+    "resources": [
+        {
+            "name": "[parameters('appServicePlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location')]",
+            "apiVersion": "2021-02-01",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic"
+            },
+            "kind": "linux",
+            "properties": {
+                "name": "[parameters('appServicePlanName')]",
+                "workerSizeId": 0,
+                "numberOfWorkers": "[parameters('instanceCount')]",
+                "reserved": true
+            }
+        }
+    ]
+}

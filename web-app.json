@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the web app"
+            }
+        },
+        "appServicePlanId": {
+            "type": "string",
+            "metadata": {
+                "description": "ID of the app service plan resource"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "runtimeStack": {
+            "type": "string",
+            "defaultValue": "DOTNETCORE|6.0",
+            "metadata": {
+                "description": "The runtime stack for the web app."
+            }
+        }
+    },
+
+    "resources": [
+        {
+            "name": "[parameters('webAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[parameters('location')]",
+            "apiVersion": "2021-02-01",
+            "properties": {
+                "serverFarmId": "[parameters('appServicePlanId')]",
+                "siteConfig": {
+                    "linuxFxVersion": "[parameters('runtimeStack')]"
+                }
+            },
+            "dependsOn": [
+                "[parameters('appServicePlanId')]"
+            ],
+            "sku": {
+                "name": "B1",
+                "tier": "Basic"
+            }
+        }
+    ]
+}
